@@ -1,14 +1,14 @@
 public class MyImage {
-    private String landmark;
+    private String landmarkName;
     private String url;
 
-    public MyImage(String landmark, String url) {
-        this.landmark = landmark;
+    public MyImage(String landmarkName, String url) {
+        this.landmarkName = landmarkName;
         this.url = url;
     }
 
-    public String getLandmark() {
-        return landmark;
+    public String getLandmarkName() {
+        return landmarkName;
     }
 
     public String getUrl() {

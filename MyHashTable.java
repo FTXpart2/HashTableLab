@@ -1,19 +1,19 @@
 public class MyHashTable {
     private DLList<Entry>[] table;
-    private static final int SIZE = 26; // Assuming one entry per letter of the alphabet
+    private static final int SIZE = 26; // One entry per letter of the alphabet
 
     @SuppressWarnings("unchecked")
     public MyHashTable() {
-        // Specify the generic type for DLList
-        table = (DLList<Entry>[]) new DLList<?>[SIZE]; 
+        table = (DLList<Entry>[]) new DLList<?>[SIZE];
         for (int i = 0; i < SIZE; i++) {
-            table[i] = new DLList<Entry>(); // Specify the generic type here as well
+            table[i] = new DLList<>();
         }
     }
 
     public void addCountry(Country country) {
         int index = getIndex(country.getAbbreviation());
-        table[index].add(new Entry(country, new DLList<MyImage>()));
+        table[index].add(new Entry(country, new DLList<>()));
+        System.out.println("Added country: " + country.getName() + " (" + country.getAbbreviation() + ")");
     }
 
     public void addImage(Country country, MyImage image) {
@@ -21,29 +21,24 @@ public class MyHashTable {
         for (Entry entry : table[index]) {
             if (entry.getCountry().equals(country)) {
                 entry.getImages().add(image);
+                System.out.println("Added image for " + country.getName() + ": " + image.getLandmarkName());
                 return;
             }
         }
+        // If the country was not found, add a new entry with the image
+        DLList<MyImage> images = new DLList<>();
+        images.add(image);
+        table[index].add(new Entry(country, images));
     }
 
-    public Country getCountry(String abbreviation) {
-        int index = getIndex(abbreviation);
-        for (Entry entry : table[index]) {
-            if (entry.getCountry().getAbbreviation().equals(abbreviation)) {
-                return entry.getCountry();
-            }
-        }
-        return null;
-    }
-
-    public MyImage[] getImages(Country country) {
+    public DLList<MyImage> getImages(Country country) {
         int index = getIndex(country.getAbbreviation());
         for (Entry entry : table[index]) {
             if (entry.getCountry().equals(country)) {
-                return entry.getImages().toArray(); // No arguments, assumes method to return an Object[]
+                return entry.getImages();
             }
         }
-        return new MyImage[0]; // No images found
+        return new DLList<>(); // Return an empty list if no images are found
     }
 
     public void removeImage(Country country, MyImage image) {
@@ -51,21 +46,23 @@ public class MyHashTable {
         for (Entry entry : table[index]) {
             if (entry.getCountry().equals(country)) {
                 entry.getImages().remove(image);
+                System.out.println("Removed image for " + country.getName() + ": " + image.getLandmarkName());
                 return;
             }
         }
     }
-    public void removeCountry(String abbreviation) {
-    int index = getIndex(abbreviation);
-    DLList<Entry> entryList = table[index];
-    for (int i = 0; i < entryList.size(); i++) {
-        Entry entry = entryList.get(i);
-        if (entry.getCountry().getAbbreviation().equals(abbreviation)) {
-            entryList.remove(i); // Remove the entry if found
-            return;
+
+    public void removeCountry(Country country) {
+        int index = getIndex(country.getAbbreviation());
+        DLList<Entry> entries = table[index];
+        for (int i = 0; i < entries.size(); i++) {
+            if (entries.get(i).getCountry().equals(country)) {
+                entries.remove(i);
+                System.out.println("Removed country: " + country.getName() + " (" + country.getAbbreviation() + ")");
+                break;
+            }
         }
     }
-}
 
     public DLList<Country> getCountries() {
         DLList<Country> countries = new DLList<>();
@@ -78,10 +75,10 @@ public class MyHashTable {
     }
 
     private int getIndex(String abbreviation) {
-        return abbreviation.charAt(0) - 'a'; // Simple hash function
+        return abbreviation.toLowerCase().charAt(0) - 'a'; // Hash function based on first letter
     }
 
-    private class Entry {
+    private static class Entry {
         private Country country;
         private DLList<MyImage> images;
 
